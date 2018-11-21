@@ -1,0 +1,25 @@
+group 'com.sht'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+
+
+repositories {
+    mavenCentral()
+    google()
+    jcenter()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+//指定编译的编码
+
+//解决idea 和 Android studio编码的不同
+tasks.withType(JavaCompile){
+    options.encoding = "UTF-8"
+}

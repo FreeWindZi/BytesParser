@@ -1,0 +1,2 @@
+# BytesParser
+用于将Bytes数组转化为Object，和将Object转化为Bytes

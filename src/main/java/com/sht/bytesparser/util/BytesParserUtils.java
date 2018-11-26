@@ -1,8 +1,6 @@
 package com.sht.bytesparser.util;
 
-import com.sht.bytesparser.annotation.BitsInfo;
 import com.sht.bytesparser.annotation.BytesInfo;
-import com.sht.bytesparser.annotation.OrderInfo;
 import com.sht.bytesparser.parser.JavaDataType;
 import com.sht.bytesparser.parser.JavaTypeProvide;
 
@@ -13,9 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.sht.bytesparser.parser.JavaDataType.CHAR_TYPE;
 import static com.sht.bytesparser.parser.JavaDataType.FLOATS_TYPE;
@@ -31,53 +26,19 @@ public class BytesParserUtils {
 
         List<Field> validFields = new ArrayList<>();
         for (Field field: type.getDeclaredFields()) {
-            if (field.isAnnotationPresent(BytesInfo.class) || field.isAnnotationPresent(BitsInfo.class)){
+            if (field.isAnnotationPresent(BytesInfo.class)){
                 validFields.add(field);
             }
         }
         Collections.sort(validFields, new Comparator<Field>() {
             @Override
             public int compare(Field field1, Field field2) {
-                int order1 ;
-                BytesInfo info1 =  CompatUtils.getDeclaredAnnotation(field1, BytesInfo.class);
-                if (info1 != null){
-                    order1 = info1.order();
-                }else {
-                    order1 =CompatUtils.getDeclaredAnnotation(field1, BitsInfo.class).order();
-                }
-
-                int order2 ;
-                BytesInfo info2 = CompatUtils.getDeclaredAnnotation(field2, BytesInfo.class);
-                if (info2 != null){
-                    order2 = info2.order();
-                }else {
-                    order2 = CompatUtils.getDeclaredAnnotation(field2, BitsInfo.class).order();
-                }
-                return order1 == order2 ? 0 : (order1 > order2 ? 1 : -1);
+                int order1 = CompatUtils.getDeclaredAnnotation(field1, BytesInfo.class).order();
+                int order2 = CompatUtils.getDeclaredAnnotation(field2, BytesInfo.class).order();
+                return Integer.compare(order1, order2);
             }
         });
         return validFields;
-
-//        return Stream.of(type.getDeclaredFields())
-//                .filter(field -> field.isAnnotationPresent(BytesInfo.class) || field.isAnnotationPresent(BitsInfo.class) )
-//                .sorted((Field field1, Field field2) -> {
-//                    int order1 ;
-//                    BytesInfo info1 = field1.getDeclaredAnnotation(BytesInfo.class);
-//                    if (info1 != null){
-//                        order1 = info1.order();
-//                    }else {
-//                        order1 = field1.getDeclaredAnnotation(BitsInfo.class).order();
-//                    }
-//
-//                    int order2 ;
-//                    BytesInfo info2 = field2.getDeclaredAnnotation(BytesInfo.class);
-//                    if (info2 != null){
-//                        order2 = info2.order();
-//                    }else {
-//                        order2 = field2.getDeclaredAnnotation(BitsInfo.class).order();
-//                    }
-//                    return order1 == order2 ? 0 : (order1 > order2 ? 1 : -1);
-//                }).collect(Collectors.toList());
 
     }
 

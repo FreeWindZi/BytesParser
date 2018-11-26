@@ -136,7 +136,7 @@ public class StringJavaDataType extends JavaDataType {
         Field relateField = null;
         try {
             relateField = object.getClass().getDeclaredField(relateFieldName);
-            BytesInfo relateBytesInfo = CompatUtils.getDeclaredAnnotation(field, BytesInfo.class);
+            BytesInfo relateBytesInfo = CompatUtils.getDeclaredAnnotation(relateField, BytesInfo.class);
             if (relateBytesInfo == null || !relateBytesInfo.lenFlag()){
                 throw new NullPointerException("Field named " + relateFieldName +", has not relate flag, lenFlag must be true");
             }

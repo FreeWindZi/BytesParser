@@ -1,6 +1,5 @@
 package com.sht.bytesparser;
 
-import com.sht.bytesparser.annotation.BitsInfo;
 import com.sht.bytesparser.annotation.BytesInfo;
 import com.sht.bytesparser.log.LoggerUtil;
 import com.sht.bytesparser.parser.JavaDataType;
@@ -10,9 +9,7 @@ import com.sht.bytesparser.parser.ParsedResult;
 import com.sht.bytesparser.util.BytesParserUtils;
 import com.sht.bytesparser.util.CompatUtils;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
@@ -223,9 +220,6 @@ public class BytesParser {
         int bitLength = 0;
         for (Field field : fields) {
             BytesInfo info = CompatUtils.getDeclaredAnnotation(field, BytesInfo.class);
-            if (info == null) {
-                return CompatUtils.getDeclaredAnnotation(field, BitsInfo.class).len();
-            }
 
             if (!field.getType().isArray()) {
                 if (info.len() == BytesInfo.INVALID_LEN) {
@@ -260,7 +254,4 @@ public class BytesParser {
         return bitLength / 8;
     }
 
-    public static void main(String argv[]) {
-        LoggerUtil.d("顾大大");
-    }
 }

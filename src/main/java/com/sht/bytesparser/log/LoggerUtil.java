@@ -20,6 +20,8 @@ public class LoggerUtil  {
     }
     public static void d(String message, Object... args) {
         log.d(message, args);
+        System.out.println(String.format(message, args));
+
     }
     public static void v(String message, Object... args) {
         log.v(message, args);

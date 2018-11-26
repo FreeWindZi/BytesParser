@@ -17,6 +17,8 @@ public class AbstractTest {
     protected BytesParser bytesParser;
     protected String charsetName = "GB2312";
 
+
+
     @Before
     public void setUp() throws Exception {
         

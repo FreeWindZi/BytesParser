@@ -2,9 +2,12 @@ group 'com.sht'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'idea'
 
 sourceCompatibility = 1.8
 
+//版本属性
+version = '0.11'
 
 
 repositories {
@@ -12,6 +15,9 @@ repositories {
     google()
     jcenter()
 }
+
+
+
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
@@ -22,4 +28,33 @@ dependencies {
 //解决idea 和 Android studio编码的不同
 tasks.withType(JavaCompile){
     options.encoding = "UTF-8"
+}
+
+
+
+jar{
+    String someString = ''
+    configurations.runtime.each {someString = someString + " lib\\"+it.name} //遍历项目的所有依赖的jar包赋值给变量someString
+    manifest {
+        attributes 'Main-Class': 'com.sht.bytesparser.BytesParser'
+        attributes 'Class-Path': someString
+    }
+
+}
+
+//清除上次的编译过的文件
+task clearPj(type:Delete){
+    delete 'build','target'
+}
+
+task copyJar(type:Copy){
+    from configurations.runtime
+    into ('build/libs/lib')
+
+}
+
+//把JAR复制到目标目录
+task release(type: Copy,dependsOn: [build,copyJar]) {
+    from  'conf'
+    into ('build/libs/eachend/conf') // 目标位置
 }

@@ -1,36 +1,29 @@
 package com.sht.bytesparser;
 
-import com.sht.bytesparser.annotation.BytesInfo;
+import com.sht.bytesparser.annotation.BytesSerializable;
+import com.sht.bytesparser.bean.ClassInfo;
+import com.sht.bytesparser.bean.DataNode;
+import com.sht.bytesparser.exception.AnnotationException;
+import com.sht.bytesparser.exception.IllegalValueException;
+import com.sht.bytesparser.exception.InternalException;
 import com.sht.bytesparser.log.LoggerUtil;
-import com.sht.bytesparser.parser.JavaDataType;
-import com.sht.bytesparser.parser.JavaTypeProvide;
-import com.sht.bytesparser.parser.interf.ParsableType;
-import com.sht.bytesparser.parser.ParsedResult;
-import com.sht.bytesparser.util.BytesParserUtils;
-import com.sht.bytesparser.util.CompatUtils;
+import com.sht.bytesparser.util.AnnotationUtils;
 
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.List;
-
-import static com.sht.bytesparser.annotation.BytesInfo.LEN_FLAG_SUFFIX;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BytesParser {
-    private ByteOrder order;
-
-    private String charsetName = "UTF-8";
-
-    JavaTypeProvide typeProvide = new JavaTypeProvide();
-
+    private ByteOrder order = ByteOrder.BIG_ENDIAN;
+    private Charset charset = Charset.forName("UTF-8");
     private BytesParser() {
     }
-
-
     private BytesParser(BytesParser origin) {
         this.order = origin.order;
-        this.charsetName = origin.charsetName;
-        this.typeProvide = origin.typeProvide;
+        this.charset = origin.charset;
     }
 
     public static class Builder {
@@ -46,13 +39,8 @@ public class BytesParser {
             return this;
         }
 
-        public Builder charsetName(String charsetName) {
-            target.charsetName = charsetName;
-            return this;
-        }
-
-        public Builder addJavaType(Class<?> clz, JavaDataType javaDataType) {
-            target.typeProvide.addJavaType(clz, javaDataType);
+        public Builder charsetName(Charset charset) {
+            target.charset = charset;
             return this;
         }
 
@@ -63,195 +51,61 @@ public class BytesParser {
     }
 
 
-//==========================================实现 code =====================
+    private final Map<Class<? extends BytesSerializable>, DataNode> rootNodeCache = new HashMap<>();
+    private final Map<Class<? extends BytesSerializable>, ClassInfo> rootNodeClassInfoCache = new HashMap<>();
 
 
-    public <T> T toBean(Class<T> clz, byte[] bytes) {
-        return toBean(clz, bytes, 0, bytes.length);
-    }
-
-    public <T> T toBean(Class<T> clz, byte[] bytes, int start) {
-        List<Field> fields = checkAndGetFields(clz);
-        int length = getByteLength(fields);
-        return toBean(clz, bytes, start, length);
-    }
-
-    public <T> T toBean(Class<T> clz, byte[] bytes, int start, int length) {
-        //判断注解
-        List<Field> fields = checkAndGetFields(clz);
-//        int length = checkAndGetByteLength(fields, start, bytes.length);
-        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes, start, length);
-        return toBean(clz, fields, byteBuffer, start, length);
-    }
-
-    public <T> T toBean(Class<T> clz, ByteBuffer byteBuffer) {
-        List<Field> fields = checkAndGetFields(clz);
-        int start = byteBuffer.position();
-        int limite = byteBuffer.limit();
-        return toBean(clz, fields, byteBuffer, start, limite - start);
-    }
-
-    public <T> T toBean(Class<T> clz, ByteBuffer byteBuffer, int start, int length) {
-        List<Field> fields = checkAndGetFields(clz);
-        byteBuffer.position(start);
-        byteBuffer.limit(start + length);
-        return toBean(clz, fields, byteBuffer, start, length);
-    }
-
-
-    private <T> T toBean(Class<T> clz, List<Field> fields, ByteBuffer byteBuffer, int start, int length) {
-        T object = BytesParserUtils.newInstance(clz);
-        byteBuffer.order(order);
-        int beginPos = start;
-        for (Field field : fields) {
-            if (beginPos >= start + length) {
-                LoggerUtil.e("Ran out of bytes to parseBytesToBean, total byte size=["
-                        + length + " but trying to parseBytesToBean field[" + field + "]");
-                break;
-            }
-            byteBuffer.position(beginPos);
-            ParsableType parsableType = typeProvide.getParsableType(field.getType());
-
-            ParsedResult result = parsableType.parseBytesToBean(object, field, byteBuffer, beginPos);
-            BytesParserUtils.setFieldValue(object, field, result.getValue());
-            beginPos += result.getBytesUsed();
-
+    public <T extends BytesSerializable> byte[] toBytes(T object) throws AnnotationException, IllegalValueException {
+        if (object == null) {
+            return null;
         }
-        System.out.println();
-        return object;
-    }
-
-
-    //转换成二进制
-
-    public byte[] toBytes(Object object) {
-        Class<?> clz = object.getClass();
-        List<Field> fields = checkAndGetFields(clz);
-        List<Field> needInitField = BytesParserUtils.getNeedInitField(fields);
-        int needAddLen = 0;
-        for (Field field : needInitField) {
-            //去掉后缀，并获取关联的Field
-            Field relateField = null;
-            Object relateValue = null;
-            try {
-                relateField = clz.getDeclaredField(field.getName().substring(0, field.getName().indexOf(LEN_FLAG_SUFFIX)));
-                relateValue = BytesParserUtils.getFieldValue(object, relateField);
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-                throw new IllegalArgumentException(String.format("%s has no ralate Field, and the ralate Field must be named %s"
-                        , field.getName(), field.getName().substring(0, field.getName().indexOf(LEN_FLAG_SUFFIX))));
-            }
-            Integer needInitFieldValueInt = (Integer) typeProvide.getParsableType(relateField.getType())
-                    .getNeedInitFieldValue(relateField, relateValue, field);
-
-            needAddLen += needInitFieldValueInt;
-            Object needInitFieldValue = null;
-            if (JavaDataType.BYTE_TYPE.contains(field.getType())) {
-                needInitFieldValue = needInitFieldValueInt.byteValue();
-            } else if (JavaDataType.SHORT_TYPE.contains(field.getType())) {
-                needInitFieldValue = needInitFieldValueInt.shortValue();
-            } else if (JavaDataType.CHAR_TYPE.contains(field.getType())) {
-                short value = needInitFieldValueInt.shortValue();
-                char charValue = (char) (value);
-                needInitFieldValue = charValue;
-            } else {
-                needInitFieldValue = needInitFieldValueInt;
-            }
-            BytesParserUtils.setFieldValue(object, field, needInitFieldValue);
+        try {
+            AnnotationUtils.checkAnnotationOrThrow(object.getClass());
+            DataNode root = getTairaNode(object.getClass(), charset);
+            int byteSize = root.evaluateSize(object);
+            ByteBuffer byteBuffer = ByteBuffer.allocate(byteSize).order(order);
+            root.serialize(byteBuffer, object);
+            return byteBuffer.array();
+        } catch (InternalException e) {
+            LoggerUtil.e(e.toString());
         }
-
-        int length = getByteLength(fields);
-        length += needAddLen;
-        byte dst[] = new byte[length];
-        toBytes(object, dst, 0, length);
-        return dst;
-    }
-
-    public void toBytes(Object object, byte dst[], int start, int length) {
-        Class<?> clz = object.getClass();
-        List<Field> fields = checkAndGetFields(clz);
-        ByteBuffer byteBuffer = ByteBuffer.wrap(dst, start, length);
-        byteBuffer.order(order);
-        int beginPos = start;
-        for (Field field : fields) {
-            byteBuffer.position(beginPos);
-            Object fieldValue = BytesParserUtils.getFieldValue(object, field);
-            ParsableType parsableType = typeProvide.getParsableType(field.getType());
-            ParsedResult result = parsableType.parseBeanToBytes(field, fieldValue, byteBuffer, beginPos);
-            beginPos += result.getBytesUsed();
-        }
-
-    }
-
-    public ByteBuffer parseBeanToByteBuffer(Object object) {
-        Class<?> clz = object.getClass();
-
-
         return null;
     }
-
-
-    //=====================================check
-
-    private List<Field> checkAndGetFields(Class<?> clz) {
-        List<Field> fields = BytesParserUtils.getParsableFieldsSortedByOrder(clz);
-        if (fields == null || fields.size() == 0) {
-            throw new IllegalArgumentException("No field annotated with ElementField is found in ["
-                    + clz.getName() + "]");
+    public  <T extends BytesSerializable> T toBean( Class<T> clazz, byte[] array) {
+        ByteBuffer buffer;
+        try {
+            buffer = ByteBuffer.wrap(array).order(order);
+        } catch (IndexOutOfBoundsException | IllegalStateException e) {
+            throw new InternalException(e);
         }
-        return fields;
+        return deserializeBuffer(buffer, clazz);
     }
-
-    private int checkAndGetByteLength(int start, int length, int totalByteLength) {
-        if (start + length > totalByteLength) {
-            throw new IllegalArgumentException("the length of bytes is smaller than need");
-        }
-        return length;
+    private <T extends BytesSerializable> T deserializeBuffer(ByteBuffer buffer, Class<T> clazz) {
+        DataNode root = getTairaNode(clazz, charset);
+        return (T) root.deserialize(buffer);
     }
 
 
-    public int getByteLength(Class<?> clz){
-        List<Field> fields = checkAndGetFields(clz);
-        return getByteLength(fields);
+    private DataNode getTairaNode(Class<? extends BytesSerializable> clazz, Charset charset) {
+        DataNode node = rootNodeCache.get(clazz);
+        if (node == null) {
+            node = new DataNode(clazz, charset);
+            rootNodeCache.put(clazz, node);
+        }
+        return node;
     }
 
-    private int getByteLength(List<Field> fields) {
-
-        int bitLength = 0;
-        for (Field field : fields) {
-            BytesInfo info = CompatUtils.getDeclaredAnnotation(field, BytesInfo.class);
-
-            if (!field.getType().isArray()) {
-                if (info.len() == BytesInfo.INVALID_LEN) {
-                    Integer defaultLen = (Integer) CompatUtils.getOrDefault(JavaDataType.JAVA_DATA_TYPE_SIZE, field.getType(), 0);
-                    bitLength += defaultLen;
-                } else {
-                    bitLength += info.len() * 8;
-                }
-            } else {
-                //处理数组
-                Class<?> componentType = field.getType().getComponentType();
-                if (componentType.isArray()){
-                    throw new UnsupportedOperationException("just support one dimensional array");
-                }
-                if (info.len() == BytesInfo.INVALID_LEN){
-                    throw new IllegalArgumentException("just suppor fix length array");
-                }else {
-                    int uintLen = 0;
-                    if (info.unitLen() == BytesInfo.INVALID_LEN){
-                        uintLen = (Integer) CompatUtils.getOrDefault(JavaDataType.JAVA_DATA_TYPE_SIZE, componentType, 0);
-                    }else {
-                        uintLen = info.unitLen() * 8;
-                    }
-                    bitLength += (info.len() * uintLen);
-                }
-
-            }
+    private ClassInfo getClassInfo(Class<? extends BytesSerializable> clazz){
+        ClassInfo classInfo = rootNodeClassInfoCache.get(clazz);
+        if (classInfo == null){
+            classInfo = new ClassInfo();
+            classInfo.nonFixLength = AnnotationUtils.isNonFixLength(clazz);
+            classInfo.byteSize = AnnotationUtils.getMinByteSize(clazz);
         }
-        if (bitLength % 8 != 0) {
-            throw new IllegalArgumentException("the length of all BitsInfos must be be divided exactly by eight");
-        }
-        return bitLength / 8;
+        return classInfo;
     }
+
+
+
 
 }

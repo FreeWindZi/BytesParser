@@ -1,8 +1,6 @@
 package com.sht.bytesparser.annonation;
 
 import com.sht.bytesparser.BytesParser;
-import com.sht.bytesparser.parser.StringJavaDataType;
-
 import org.junit.After;
 import org.junit.Before;
 
@@ -24,7 +22,6 @@ public class AbstractTest {
         
         bytesParser = new BytesParser.Builder()
                 .order(ByteOrder.BIG_ENDIAN)
-                .addJavaType(String.class, new StringJavaDataType(charsetName))
                 .build();
     }
 

@@ -1,11 +1,12 @@
 package com.sht.bytesparser.annonation.bean;
 
 import com.sht.bytesparser.annotation.BytesInfo;
-import com.sht.bytesparser.parser.bean.Reserved;
+import com.sht.bytesparser.annotation.BytesSerializable;
+import com.sht.bytesparser.bean.Reserved;
 
 import java.util.Objects;
 
-public class ReservedBean {
+public class ReservedBean implements BytesSerializable {
 
     @BytesInfo(order = 1, len = 2)
     private int temperature;

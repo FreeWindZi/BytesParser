@@ -7,7 +7,7 @@ apply plugin: 'idea'
 sourceCompatibility = 1.8
 
 //版本属性
-version = '0.11'
+version = '0.12'
 
 
 repositories {

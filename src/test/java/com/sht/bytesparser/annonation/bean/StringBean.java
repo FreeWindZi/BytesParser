@@ -1,12 +1,13 @@
 package com.sht.bytesparser.annonation.bean;
 
 import com.sht.bytesparser.annotation.BytesInfo;
+import com.sht.bytesparser.annotation.BytesSerializable;
 
 import java.util.Objects;
 
 public class StringBean {
 
-    public static class Template{
+    public static class Template implements BytesSerializable {
         @BytesInfo(order = 1, len = 20)
         String accout;
         @BytesInfo(order = 2, len = 16)
@@ -40,7 +41,7 @@ public class StringBean {
     }
 
 
-    public static class Template2{
+    public static class Template2 implements BytesSerializable{
         @BytesInfo(order = 1, lenFlag = true)
         char nameLen;
         @BytesInfo(order = 2)

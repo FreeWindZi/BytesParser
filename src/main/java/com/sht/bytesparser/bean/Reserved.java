@@ -1,4 +1,4 @@
-package com.sht.bytesparser.parser.bean;
+package com.sht.bytesparser.bean;
 
 /**
  * Created by navy on 2018/11/15.

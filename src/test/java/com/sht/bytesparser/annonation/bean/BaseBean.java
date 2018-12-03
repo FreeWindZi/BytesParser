@@ -2,26 +2,27 @@ package com.sht.bytesparser.annonation.bean;
 
 
 import com.sht.bytesparser.annotation.BytesInfo;
+import com.sht.bytesparser.annotation.BytesSerializable;
 
 import java.util.Objects;
 
 public  class BaseBean {
 
 
-    public static class Template{
-        @BytesInfo(order = 1)
+    public static class Template implements BytesSerializable {
+        @BytesInfo(order = 0)
         byte byteValue;
-        @BytesInfo(order = 2)
+        @BytesInfo(order = 1)
         short shortValue;
-        @BytesInfo(order = 3)
+        @BytesInfo(order = 2)
         char charValue;
-        @BytesInfo(order = 4)
+        @BytesInfo(order = 3)
         int intValue;
-        @BytesInfo(order = 5)
+        @BytesInfo(order = 4)
         long longValue;
-        @BytesInfo(order = 6)
+        @BytesInfo(order = 5)
         float floatValue;
-        @BytesInfo(order = 7)
+        @BytesInfo(order = 6)
         double doubleValue;
 
         public Template() {
@@ -123,7 +124,7 @@ public  class BaseBean {
     }
 
 
-    public static class Template2{
+    public static class Template2 implements BytesSerializable{
         @BytesInfo(order = 1)
         Byte byteValue;
         @BytesInfo(order = 2)

@@ -1,12 +1,13 @@
 package com.sht.bytesparser.annonation.bean;
 
 import com.sht.bytesparser.annotation.BytesInfo;
+import com.sht.bytesparser.annotation.BytesSerializable;
 
 import java.util.Arrays;
 
 public class ArrayBean {
 
-    public static class Template{
+    public static class Template implements BytesSerializable{
         @BytesInfo(order = 1)
         private byte result;
         @BytesInfo(order = 2, len = 10)

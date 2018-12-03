@@ -226,36 +226,6 @@ public enum  PrimitiveType implements PrimitiveProcessor {
         }
     };
 
-//    ReservedType{
-//        @Override
-//        public void serialize(Object value, ByteBuffer buffer, int size) {
-//            for (int i = 0; i < size; i++){
-//                buffer.put((byte)0);
-//            }
-//        }
-//
-//        @Override
-//        public Object deserialize(ByteBuffer buffer, int size) {
-//            return null;
-//        }
-//
-//        @Override
-//        public boolean canProcess(Class clazz) {
-//            return clazz == Reserved.class;
-//        }
-//
-//        @Override
-//        public int byteSize() {
-//            return 0;
-//        }
-//
-//        @Override
-//        public Object defaultValue() {
-//            return null;
-//        }
-//    };
-
-
 
     /**
      * put long value lower bytes into buffer
@@ -294,6 +264,10 @@ public enum  PrimitiveType implements PrimitiveProcessor {
                 longValue = (longValue << 8) + (byteValue & 0xff);
             }
         }
+
+
         return longValue;
     }
+
+
 }

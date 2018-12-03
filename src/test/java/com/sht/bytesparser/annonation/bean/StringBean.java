@@ -42,14 +42,14 @@ public class StringBean {
 
 
     public static class Template2 implements BytesSerializable{
-        @BytesInfo(order = 1, lenFlag = true)
+        @BytesInfo(order = 0, lenFlag = true)
         char nameLen;
-        @BytesInfo(order = 2)
+        @BytesInfo(order = 1)
         String name;
 
-        @BytesInfo(order = 3, lenFlag = true)
+        @BytesInfo(order = 2, lenFlag = true)
         char headerUrlLen;
-        @BytesInfo(order = 4)
+        @BytesInfo(order = 3)
         String headerUrl;
 
         public Template2() {

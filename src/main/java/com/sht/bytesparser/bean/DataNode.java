@@ -97,6 +97,10 @@ public class DataNode extends Node {
                 children.add(new PrimitiveNode(field, primitive));
                 continue;
             }
+            if (field.getType() == Reserved.class){
+                children.add(new ReservedNode(field));
+                continue;
+            }
             if (field.getType() == String.class){
                 children.add(new StringNode(field, charset));
                 continue;

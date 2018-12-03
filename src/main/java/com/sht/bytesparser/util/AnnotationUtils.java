@@ -82,10 +82,9 @@ public class AnnotationUtils {
             // non Fix Attribute
             if (isSupportNonFixType(fieldType) && info.len() == BytesInfo.INVALID_LEN){
                 if (info.lenFlagBytesSize() > 0){
-                    continue;
                 }else {
                     throw new AnnotationException("Field [" + field.getName()+ "] "+
-                        "@BytesInfo lenFlagBytesSize must be greater than 0");
+                        "@BytesInfo lenFlagBytesSize must be greater than 0 in class [ " + clazz.getName()+ "]") ;
                 }
             }
 
@@ -93,6 +92,13 @@ public class AnnotationUtils {
             //check advanced type : String; Array; Collection
             if (TypeConst.isSupportedCollection(fieldType) || fieldType.isArray()) {
                 Class memberType = ReflectionUtils.getCollectionFirstMemberType(field);
+
+                PrimitiveType memberPrimitiveType = TypeConst.findPrimitive(memberType);
+                if (memberPrimitiveType != null){
+                    //checkPrimitiveType(clazz, field, memberPrimitiveType, info.len());
+                    continue;
+                }
+
                 // abstract or interface member type not supported
                 if (ReflectionUtils.isInterfaceOrAbstract(memberType)) {
                     throw new AnnotationException(

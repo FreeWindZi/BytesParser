@@ -38,4 +38,28 @@ public class A4_ArrayTest extends AbstractTest {
         LoggerUtil.d(tenpTemplate.toString());
     }
 
+
+    @Test
+    public void listTest(){
+        ArrayBean.Teacher teacher = new ArrayBean.Teacher();
+        teacher.name = "I am a Teacher";
+        teacher.id = 456789;
+        int len = 10;
+        for (int i = 0; i < len; i++ ){
+            ArrayBean.Student student = new ArrayBean.Student();
+            student.grade = i + 90;
+            student.id = i;
+            for (int j =0; j < 5 + i; j++){
+                student.books.add((byte)j);
+            }
+
+            teacher.students.add(student);
+        }
+
+        byte data[] = bytesParser.toBytes(teacher);
+        ArrayBean.Teacher temp = bytesParser.toBean(ArrayBean.Teacher.class, data);
+        Assert.assertEquals(temp, teacher);
+        LoggerUtil.d(temp.toString());
+
+    }
 }

@@ -18,7 +18,8 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- */
+ *//*
+
 package com.sht.bytesparser.bean;
 
 
@@ -35,93 +36,96 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 
+*/
 /**
  * node for processing collection & array
- */
-@SuppressWarnings({ "unchecked" })
-public class CollectionNode extends FixOrNonFixNode {
+ *//*
 
-    /**
+@SuppressWarnings({ "unchecked" })
+public class CollectionNodeT extends Node {
+
+    */
+/**
+     * charset
+     *//*
+
+    private Charset charset;
+
+    */
+/**
+     * length defined in ParamField
+     *//*
+
+    private int length;
+
+    */
+/**
      * member type
-     */
+     *//*
+
     private Class memberType;
 
-    /**
+    */
+/**
      * member type node
-     */
+     *//*
+
     private Node memberNode;
 
-    CollectionNode(Field field, Charset charset) {
-        super(field, charset);
+    CollectionNodeT(Field field, Charset charset) {
+        super(field);
+        this.charset = charset;
+
+        BytesInfo annotation = ReflectionUtils.getAnnotation(field, BytesInfo.class);
+        length = annotation.len();
         memberType = ReflectionUtils.getCollectionFirstMemberType(field);
         memberNode = createMemberNode();
     }
 
     @Override
     public int evaluateSize(Object value) {
-        if (isFix){
-            length = annotionLen;
+        int collectionLength = getCollectionLength(value);
+        int memberByteSize = memberNode.evaluateSize(null);
+        if (length <= 0) {
+            return collectionLength * memberByteSize;
         } else {
-            length = getCollectionLength(value);
+            return length * memberByteSize;
         }
-
-        int byteSize = 0;
-        if (! isFix){
-            byteSize += lenFlagBytesSize;
-        }
-
-        if (value.getClass().isArray()){
-            for (int i = 0; i < length; i++){
-                byteSize += memberNode.evaluateSize(Array.get(value, i));
-            }
-        } else {
-            Collection collection = (Collection) value;
-            for (Object member : collection) {
-                byteSize += memberNode.evaluateSize(member);
-            }
-        }
-        return byteSize;
     }
 
     @Override
     public void serialize(ByteBuffer buffer, Object value) {
-        length = getCollectionLength(value);
-        if (isFix){
-            checkOverflow(length);
-            serializeMembers(buffer, value);
-        }else {
-            PrimitiveType.INT.serialize(length, buffer, lenFlagBytesSize);
-            serializeMembers(buffer, value);
-        }
+        int collectionLength = getCollectionLength(value);
+        checkOverflow(collectionLength);
+        serializeMembers(buffer, value);
     }
 
     @Override
     public Object deserialize(ByteBuffer buffer) {
-
-        Object fieldValue = null;
-        int length = 0;
-        if (isFix){
-            length = annotionLen;
+        Collection collection;
+        if (clazz.isArray()) {
+            collection = new ArrayList();
         } else {
-            length = (int) PrimitiveType.INT.deserialize(buffer, lenFlagBytesSize);
+            collection = TypeConst.newCollection(clazz);
         }
-        boolean isArray = false;
-        if (clazz.isArray()){
-            fieldValue = Array.newInstance(memberType, length);
-            isArray = true;
+        if (collection == null) {
+            return null;
+        }
+        if (length <= 0) {
+            // buffer tail
+            while (buffer.position() < buffer.limit()) {
+                collection.add(memberNode.deserialize(buffer));
+            }
         } else {
-            fieldValue = TypeConst.newCollection(clazz);
-        }
-
-        for (int i = 0; i < length; i++){
-            if (isArray){
-                Array.set(fieldValue, i, memberNode.deserialize(buffer));
-            }else {
-                ((Collection) fieldValue).add(memberNode.deserialize(buffer));
+            for (int i = 0; i < length; i++) {
+                collection.add(memberNode.deserialize(buffer));
             }
         }
-
-        return fieldValue;
+        if (clazz.isArray()) {
+            return collection.toArray((Object[]) Array.newInstance(memberType, collection.size()));
+        } else {
+            return collection;
+        }
     }
 
     private Node createMemberNode() {
@@ -149,9 +153,9 @@ public class CollectionNode extends FixOrNonFixNode {
     }
 
     private void serializeMembers(ByteBuffer buffer, Object value) {
-        length = getCollectionLength(value);
+        int collectionLength = getCollectionLength(value);
         if (clazz.isArray()) {
-            for (int i = 0; i < length; i++) {
+            for (int i = 0; i < collectionLength; i++) {
                 memberNode.serialize(buffer, Array.get(value, i));
             }
         } else {
@@ -161,15 +165,16 @@ public class CollectionNode extends FixOrNonFixNode {
             }
         }
         // node with length, fill remain empty bytes
-        if (isFix) {
+        if (length > 0) {
             int memberByteSize = memberNode.evaluateSize(null);
-            buffer.position(buffer.position() + (annotionLen - length) * memberByteSize);
+            buffer.position(buffer.position() + (length - collectionLength) * memberByteSize);
         }
     }
 
     private void checkOverflow(int memberCount) {
-        if (memberCount > annotionLen) {
+        if (memberCount > length) {
             throw new IllegalValueException("Field [" + field.getName() + "] overflow, [length] should be larger");
         }
     }
 }
+*/

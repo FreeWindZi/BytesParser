@@ -259,9 +259,9 @@ public enum  PrimitiveType implements PrimitiveProcessor {
         for (int i = 0; i < size; i++) {
             byte byteValue = buffer.get();
             if (buffer.order() == ByteOrder.LITTLE_ENDIAN) {
-                longValue += ((long) byteValue & 0xffL) << (8 * i);
+                longValue += ((long) byteValue & 0xFFL) << (8 * i);
             } else {
-                longValue = (longValue << 8) + (byteValue & 0xff);
+                longValue = (longValue << 8) + (byteValue & 0xFF);
             }
         }
 
@@ -269,5 +269,15 @@ public enum  PrimitiveType implements PrimitiveProcessor {
         return longValue;
     }
 
-
+    private static long getSignValue(long unsignValue, int size){
+        if (unsignValue >= 0){
+            return unsignValue;
+        }else {
+            long maxValue = 0;
+            for (int i =0; i < size; i++){
+                maxValue = (maxValue << 8) + 0xFF;
+            }
+            return maxValue + 1 + unsignValue;
+        }
+    }
 }

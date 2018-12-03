@@ -8,10 +8,10 @@ import org.junit.Test;
 public class A2_ReservedTest extends AbstractTest{
 
     ReservedBean reservedBean;
-    //int temperature = -23;
-    int temperature = 2323;
+    int temperature = -23;
+//    int temperature = 2323;
     long time = System.currentTimeMillis();
-    int leng = 20;
+    int leng = 19;
 
     @Test
     public void reservedTest() {

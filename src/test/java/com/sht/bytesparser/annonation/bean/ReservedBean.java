@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class ReservedBean implements BytesSerializable {
 
-    @BytesInfo(order = 0, len = 2)
+    @BytesInfo(order = 0, len = 1)
     private int temperature;
     @BytesInfo(order = 1, len = 10)
     private Reserved reserved;

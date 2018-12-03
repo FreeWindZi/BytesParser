@@ -33,12 +33,12 @@ import java.util.*;
 public final class TypeConst {
 
     /**
-     * TairaData instance type
+     * BytesSerializable instance type
      */
     private static final Class<BytesSerializable> BYTES_SERIALIZABLE_CLASS = BytesSerializable.class;
 
     /**
-     * currently Taira supports List & Set
+     * currently BytesParser supports List & Set
      */
     private static final Set<Class<? extends Collection>> SUPPORTED_COLLECTION_TYPE = new HashSet<>();
 

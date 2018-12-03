@@ -33,6 +33,9 @@ public @interface BytesInfo  {
     //用于字符串转化
      String charsetName() default "";
 
+     int lenFlagBytesSize() default 0;
+
+     @Deprecated
      boolean lenFlag() default false;
 
      //一维数组的时候使用

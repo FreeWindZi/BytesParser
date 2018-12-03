@@ -81,11 +81,12 @@ public class AnnotationUtils {
 
             // non Fix Attribute
             if (isSupportNonFixType(fieldType) && info.len() == BytesInfo.INVALID_LEN){
-                Field lastField = null;
-                if (i != 0){
-                    lastField = fields.get(i - 1);
+                if (info.lenFlagBytesSize() > 0){
+                    continue;
+                }else {
+                    throw new AnnotationException("Field [" + field.getName()+ "] "+
+                        "@BytesInfo lenFlagBytesSize must be greater than 0");
                 }
-                checkExistRelativeField(clazz, field, lastField);
             }
 
 
@@ -145,23 +146,25 @@ public class AnnotationUtils {
         }
     }
 
-    private static void checkExistRelativeField(Class clazz, Field field, Field lastField){
-        String relativeFieldName = field.getName()+BytesInfo.LEN_FLAG_SUFFIX;
-        if (lastField == null){
-            throw new AnnotationException("RelativeField [" + relativeFieldName + "]" + "must exist , and be front of the Field [" + field+"]" +
-                    "in class [ " +clazz.getName() +"]");
-        }
-        if(!lastField.getName().equals(relativeFieldName)){
-            throw new AnnotationException("RelativeField [" + relativeFieldName + "]" + "must exist , and be front of the Field [" + field+"]" +
-                    "in class [ " +clazz.getName() +"]");
-        }
-        BytesInfo info = lastField.getAnnotation(BytesInfo.class);
-        if (!info.lenFlag()){
-            throw new AnnotationException("@BytesInfo  lenFlag() must ture in field [" +relativeFieldName +"]" +
-                    "in class [ " +clazz.getName() +"]");
-        }
+//    private static void checkExistRelativeField(Class clazz, Field field, Field lastField){
+//        String relativeFieldName = field.getName()+BytesInfo.LEN_FLAG_SUFFIX;
+//        if (lastField == null){
+//            throw new AnnotationException("RelativeField [" + relativeFieldName + "]" + "must exist , and be front of the Field [" + field+"]" +
+//                    "in class [ " +clazz.getName() +"]");
+//        }
+//        if(!lastField.getName().equals(relativeFieldName)){
+//            throw new AnnotationException("RelativeField [" + relativeFieldName + "]" + "must exist , and be front of the Field [" + field+"]" +
+//                    "in class [ " +clazz.getName() +"]");
+//        }
+//        BytesInfo info = lastField.getAnnotation(BytesInfo.class);
+//        if (!info.lenFlag()){
+//            throw new AnnotationException("@BytesInfo  lenFlag() must ture in field [" +relativeFieldName +"]" +
+//                    "in class [ " +clazz.getName() +"]");
+//        }
+//
+//    }
 
-    }
+//    private static void checkNonFix()
 
 
     public static boolean isNonFixLength(Class<? extends BytesSerializable> clazz){

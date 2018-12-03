@@ -42,14 +42,10 @@ public class StringBean {
 
 
     public static class Template2 implements BytesSerializable{
-        @BytesInfo(order = 0, lenFlag = true)
-        char nameLen;
-        @BytesInfo(order = 1)
-        String name;
 
-        @BytesInfo(order = 2, lenFlag = true)
-        char headerUrlLen;
-        @BytesInfo(order = 3)
+        @BytesInfo(order = 0, lenFlagBytesSize = 2)
+        String name;
+        @BytesInfo(order = 1, lenFlagBytesSize = 2)
         String headerUrl;
 
         public Template2() {
@@ -63,9 +59,7 @@ public class StringBean {
         @Override
         public String toString() {
             return "Template2{" +
-                    "nameLen=" + (int)nameLen +
                     ", name='" + name + '\'' +
-                    ", headerUrlLen=" + (int)headerUrlLen +
                     ", headerUrl='" + headerUrl + '\'' +
                     '}';
         }
@@ -75,9 +69,7 @@ public class StringBean {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             Template2 template2 = (Template2) o;
-            return nameLen == template2.nameLen &&
-                    headerUrlLen == template2.headerUrlLen &&
-                    Objects.equals(name, template2.name) &&
+            return Objects.equals(name, template2.name) &&
                     Objects.equals(headerUrl, template2.headerUrl);
         }
 

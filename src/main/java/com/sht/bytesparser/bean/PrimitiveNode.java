@@ -38,6 +38,7 @@ public class PrimitiveNode extends Node {
     private PrimitiveType type;
 
     private int bytes;
+    private boolean sign = true;
 
     /**
      * collection member node without field
@@ -57,6 +58,7 @@ public class PrimitiveNode extends Node {
         this.type = type;
         BytesInfo info = ReflectionUtils.getAnnotation(field, BytesInfo.class);
         bytes = AnnotationUtils.evaluatePrimitiveSize(type, info.len());
+        this.sign = info.sign();
     }
 
     @Override
@@ -89,10 +91,20 @@ public class PrimitiveNode extends Node {
         } else {
             doubleValue = ((Number) value).doubleValue();
         }
-        double max = Math.pow(2, 8 * bytes - 1);
-        if (doubleValue >= -max && doubleValue < max) {
-            return;
+
+        if (sign){
+            double max = Math.pow(2, 8 * bytes - 1);
+            if (doubleValue >= -max && doubleValue < max) {
+                return;
+            }
+        }else {
+            double max = Math.pow(2, 8 * bytes);
+            if (doubleValue < max) {
+                return;
+            }
         }
+
+
         throw new IllegalValueException("Value [" + value + "] overflow, [bytes] should be larger");
     }
 }

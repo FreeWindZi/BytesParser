@@ -91,15 +91,21 @@ public class DataNode extends Node {
         children.clear();
         List<Field> fields = AnnotationUtils.getSortedBytesInfo(clazz);
         for (Field field : fields) {
+
             PrimitiveType primitive = TypeConst.findPrimitive(field.getType());
             if (primitive != null) {
                 children.add(new PrimitiveNode(field, primitive));
+                continue;
+            }
+            if (field.getType() == String.class){
+                children.add(new StringNode(field, charset));
                 continue;
             }
             if (TypeConst.isBytesSerializableClass(field.getType())) {
                 children.add(new DataNode(field, charset));
                 continue;
             }
+
 
             if (TypeConst.isSupportedCollection(field.getType()) || field.getType().isArray()) {
                 children.add(new CollectionNode(field, charset));

@@ -36,7 +36,7 @@ public class A1_BaseTest extends AbstractTest{
 
         LoggerUtil.d(tempTemplate.toString());
 
-        byte bytes2[] = bytesParser.toBytes(template);
+        byte bytes2[] = bytesParser.toBytes(template2);
         BaseBean.Template2 tempTemplate2 = bytesParser.toBean(BaseBean.Template2.class, bytes2);
         Assert.assertEquals(template2, tempTemplate2);
         LoggerUtil.d(tempTemplate2.toString());

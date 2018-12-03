@@ -125,19 +125,19 @@ public  class BaseBean {
 
 
     public static class Template2 implements BytesSerializable{
-        @BytesInfo(order = 1)
+        @BytesInfo(order = 0)
         Byte byteValue;
-        @BytesInfo(order = 2)
+        @BytesInfo(order = 1)
         Short shortValue;
-        @BytesInfo(order = 3)
+        @BytesInfo(order = 2)
         Character charValue;
-        @BytesInfo(order = 4)
+        @BytesInfo(order = 3)
         Integer intValue;
-        @BytesInfo(order = 5)
+        @BytesInfo(order = 4)
         Long longValue;
-        @BytesInfo(order = 6)
+        @BytesInfo(order = 5)
         Float floatValue;
-        @BytesInfo(order = 7)
+        @BytesInfo(order = 6)
         Double doubleValue;
 
         public Template2() {

@@ -8,9 +8,9 @@ import java.util.Objects;
 public class StringBean {
 
     public static class Template implements BytesSerializable {
-        @BytesInfo(order = 1, len = 20)
+        @BytesInfo(order = 0, len = 20)
         String accout;
-        @BytesInfo(order = 2, len = 16)
+        @BytesInfo(order = 1, len = 16)
         String password;
 
         public Template() {

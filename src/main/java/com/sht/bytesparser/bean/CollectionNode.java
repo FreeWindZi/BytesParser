@@ -90,7 +90,7 @@ public class CollectionNode extends FixOrNonFixNode {
             checkOverflow(length);
             serializeMembers(buffer, value);
         }else {
-            PrimitiveType.INT.serialize(length, buffer, lenFlagBytesSize);
+            PrimitiveType.INT.serialize(length, buffer, lenFlagBytesSize, false);
             serializeMembers(buffer, value);
         }
     }
@@ -103,7 +103,7 @@ public class CollectionNode extends FixOrNonFixNode {
         if (isFix){
             length = annotionLen;
         } else {
-            length = (int) PrimitiveType.INT.deserialize(buffer, lenFlagBytesSize);
+            length = (int) PrimitiveType.INT.deserialize(buffer, lenFlagBytesSize, false);
         }
         boolean isArray = false;
         if (clazz.isArray()){

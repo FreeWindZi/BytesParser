@@ -13,7 +13,7 @@ public class ContainerBean {
 
     }
     public static class Son extends Father  {
-        @BytesInfo(order = 1, len = 1, sign = true)
+        @BytesInfo(order = 1, len = 1)
         public int sonInt;
         @BytesInfo(order = 2)
         public float sonf;

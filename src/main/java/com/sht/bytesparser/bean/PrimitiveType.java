@@ -9,12 +9,12 @@ public enum  PrimitiveType implements PrimitiveProcessor {
         private static final byte FALSE = 0;
 
         @Override
-        public void serialize(Object value, ByteBuffer buffer, int size) {
+        public void serialize(Object value, ByteBuffer buffer, int size, boolean sign) {
             buffer.put((Boolean) value ? TRUE : FALSE);
         }
 
         @Override
-        public Object deserialize(ByteBuffer buffer, int size) {
+        public Object deserialize(ByteBuffer buffer, int size, boolean sign) {
             return buffer.get() == TRUE;
         }
 
@@ -36,12 +36,12 @@ public enum  PrimitiveType implements PrimitiveProcessor {
 
     BYTE {
         @Override
-        public void serialize(Object value, ByteBuffer buffer, int size) {
+        public void serialize(Object value, ByteBuffer buffer, int size, boolean sign) {
             buffer.put((byte) value);
         }
 
         @Override
-        public Object deserialize(ByteBuffer buffer, int size) {
+        public Object deserialize(ByteBuffer buffer, int size, boolean sign) {
             return buffer.get();
         }
 
@@ -63,13 +63,16 @@ public enum  PrimitiveType implements PrimitiveProcessor {
 
     CHAR {
         @Override
-        public void serialize(Object value, ByteBuffer buffer, int size) {
+        public void serialize(Object value, ByteBuffer buffer, int size, boolean sign) {
             PrimitiveType.putLowerBytes(buffer, (char) value, size);
         }
 
         @Override
-        public Object deserialize(ByteBuffer buffer, int size) {
+        public Object deserialize(ByteBuffer buffer, int size, boolean sign) {
             long longValue = PrimitiveType.getBytesToLong(buffer, size);
+            if (sign){
+                longValue = PrimitiveType.getSignValue(longValue, size);
+            }
             return (char) longValue;
         }
 
@@ -91,13 +94,17 @@ public enum  PrimitiveType implements PrimitiveProcessor {
 
     SHORT {
         @Override
-        public void serialize(Object value, ByteBuffer buffer, int size) {
+        public void serialize(Object value, ByteBuffer buffer, int size, boolean sign) {
             PrimitiveType.putLowerBytes(buffer, (short) value, size);
         }
 
         @Override
-        public Object deserialize(ByteBuffer buffer, int size) {
-            return (short) PrimitiveType.getBytesToLong(buffer, size);
+        public Object deserialize(ByteBuffer buffer, int size, boolean sign) {
+            long longValue = PrimitiveType.getBytesToLong(buffer, size);
+            if (sign){
+                longValue = PrimitiveType.getSignValue(longValue, size);
+            }
+            return (short) longValue;
         }
 
         @Override
@@ -118,13 +125,17 @@ public enum  PrimitiveType implements PrimitiveProcessor {
 
     INT {
         @Override
-        public void serialize(Object value, ByteBuffer buffer, int size) {
+        public void serialize(Object value, ByteBuffer buffer, int size, boolean sign) {
             PrimitiveType.putLowerBytes(buffer, (int) value, size);
         }
 
         @Override
-        public Object deserialize(ByteBuffer buffer, int size) {
-            return (int) PrimitiveType.getBytesToLong(buffer, size);
+        public Object deserialize(ByteBuffer buffer, int size, boolean sign) {
+            long longValue = PrimitiveType.getBytesToLong(buffer, size);
+            if (sign){
+                longValue = PrimitiveType.getSignValue(longValue, size);
+            }
+            return (int) longValue;
         }
 
         @Override
@@ -145,12 +156,12 @@ public enum  PrimitiveType implements PrimitiveProcessor {
 
     FLOAT {
         @Override
-        public void serialize(Object value, ByteBuffer buffer, int size) {
+        public void serialize(Object value, ByteBuffer buffer, int size, boolean sign) {
             PrimitiveType.putLowerBytes(buffer, Float.floatToRawIntBits((Float) value), size);
         }
 
         @Override
-        public Object deserialize(ByteBuffer buffer, int size) {
+        public Object deserialize(ByteBuffer buffer, int size, boolean sign) {
             long longVal = PrimitiveType.getBytesToLong(buffer, size);
             return Float.intBitsToFloat((int) longVal);
         }
@@ -173,12 +184,12 @@ public enum  PrimitiveType implements PrimitiveProcessor {
 
     DOUBLE {
         @Override
-        public void serialize(Object value, ByteBuffer buffer, int size) {
+        public void serialize(Object value, ByteBuffer buffer, int size, boolean sign) {
             PrimitiveType.putLowerBytes(buffer, Double.doubleToRawLongBits((Double) value), size);
         }
 
         @Override
-        public Object deserialize(ByteBuffer buffer, int size) {
+        public Object deserialize(ByteBuffer buffer, int size, boolean sign) {
             long longVal = PrimitiveType.getBytesToLong(buffer, size);
             return Double.longBitsToDouble(longVal);
         }
@@ -201,13 +212,17 @@ public enum  PrimitiveType implements PrimitiveProcessor {
 
     LONG {
         @Override
-        public void serialize(Object value, ByteBuffer buffer, int size) {
+        public void serialize(Object value, ByteBuffer buffer, int size, boolean sign) {
             PrimitiveType.putLowerBytes(buffer, (Long) value, size);
         }
 
         @Override
-        public Object deserialize(ByteBuffer buffer, int size) {
-            return PrimitiveType.getBytesToLong(buffer, size);
+        public Object deserialize(ByteBuffer buffer, int size, boolean sign) {
+            long longValue = PrimitiveType.getBytesToLong(buffer, size);
+            if (sign){
+                longValue = PrimitiveType.getSignValue(longValue, size);
+            }
+            return longValue;
         }
 
         @Override
@@ -270,14 +285,12 @@ public enum  PrimitiveType implements PrimitiveProcessor {
     }
 
     private static long getSignValue(long unsignValue, int size){
-        if (unsignValue >= 0){
+        double max = Math.pow(2, 8 * size);
+        if (unsignValue <= max * 0.5){
             return unsignValue;
-        }else {
-            long maxValue = 0;
-            for (int i =0; i < size; i++){
-                maxValue = (maxValue << 8) + 0xFF;
-            }
-            return maxValue + 1 + unsignValue;
+        } else {
+            return - (long) (max - unsignValue);
         }
+
     }
 }

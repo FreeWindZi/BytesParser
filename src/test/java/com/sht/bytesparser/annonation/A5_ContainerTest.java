@@ -12,7 +12,7 @@ public class A5_ContainerTest  extends AbstractTest{
     public void containerTest(){
         ContainerBean.Son son = new ContainerBean.Son();
         son.fInt = 1234567;
-        son.sonInt = -2;
+        son.sonInt = -90;
         son.sonf = 0.123344f;
         son.sonChar = 'a';
         byte data[] = bytesParser.toBytes(son);

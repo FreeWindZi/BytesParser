@@ -49,7 +49,7 @@ public class StringNode extends FixOrNonFixNode {
             }
             return;
         } else {
-            PrimitiveType.INT.serialize(length, buffer, lenFlagBytesSize);
+            PrimitiveType.INT.serialize(length, buffer, lenFlagBytesSize, false);
             if (byteValue != null){
                 buffer.put(byteValue);
             }
@@ -64,7 +64,7 @@ public class StringNode extends FixOrNonFixNode {
             buffer.get(bytesValue);
             return deleteSuffix(new String(bytesValue, charset));
         } else {
-            length = (int) PrimitiveType.INT.deserialize(buffer, lenFlagBytesSize);
+            length = (int) PrimitiveType.INT.deserialize(buffer, lenFlagBytesSize, false);
             if (length == 0){
                 return null;
             }else {

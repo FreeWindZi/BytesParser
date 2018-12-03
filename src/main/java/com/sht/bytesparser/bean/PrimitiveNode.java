@@ -47,6 +47,7 @@ public class PrimitiveNode extends Node {
         super(clazz);
         this.type = type;
         bytes = type.byteSize();
+        sign = false;
     }
 
     /**
@@ -69,12 +70,12 @@ public class PrimitiveNode extends Node {
     @Override
     public void serialize(ByteBuffer buffer, Object value) {
         checkOverflow(value);
-        type.serialize(value == null ? type.defaultValue() : value, buffer, bytes);
+        type.serialize(value == null ? type.defaultValue() : value, buffer, bytes, sign);
     }
 
     @Override
     public Object deserialize(ByteBuffer buffer) {
-        return type.deserialize(buffer, bytes);
+        return type.deserialize(buffer, bytes, sign);
     }
 
 
@@ -99,7 +100,7 @@ public class PrimitiveNode extends Node {
             }
         }else {
             double max = Math.pow(2, 8 * bytes);
-            if (doubleValue < max) {
+            if (0 <= doubleValue && doubleValue < max) {
                 return;
             }
         }

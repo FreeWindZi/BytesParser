@@ -33,14 +33,14 @@ public interface PrimitiveProcessor {
      *
      * @param size lower byte size
      */
-    void serialize(Object value, ByteBuffer buffer, int size);
+    void serialize(Object value, ByteBuffer buffer, int size, boolean sign);
 
     /**
      * deserialize to value from buffer
      *
      * @param size byte size
      */
-    Object deserialize(ByteBuffer buffer, int size);
+    Object deserialize(ByteBuffer buffer, int size, boolean sign);
 
     /**
      * processable

@@ -67,7 +67,7 @@ public class AnnotationUtils {
             //continue, check PrimitiveType
             PrimitiveType primitiveType = TypeConst.findPrimitive(fieldType);
             if (primitiveType != null){
-                checkPrimitiveType(clazz, field, primitiveType, info.len());
+                checkPrimitiveType(clazz, field, primitiveType, info);
                 continue;
             }
             //continue, check BytesSerializable
@@ -135,11 +135,22 @@ public class AnnotationUtils {
         }
     }
 
-    private static void checkPrimitiveType(Class clazz, Field field, PrimitiveType primitiveType, int bytes) {
-        if (primitiveType != null && bytes > 0 && bytes > primitiveType.byteSize()) {
-            throw new AnnotationException("[bytes] on field [" + field.getName() + "] in class [" + clazz.getName()
-                    + "] is too large (which should be lesser than or equal to " + primitiveType.byteSize() + ")");
+    private static void checkPrimitiveType(Class clazz, Field field, PrimitiveType primitiveType, BytesInfo info ) {
+
+        if (primitiveType != null){
+            int realByteSize = evaluatePrimitiveSize(primitiveType, info.len());
+            if (realByteSize > primitiveType.byteSize()){
+                throw new AnnotationException("[bytes] on field [" + field.getName() + "] in class [" + clazz.getName()
+                        + "] is too large (which should be lesser than or equal to " + primitiveType.byteSize() + ")");
+            }
+
+            if (realByteSize == primitiveType.byteSize() && !info.sign()){
+                throw new AnnotationException("[bytes] on field [" + field.getName() + "] in class [" + clazz.getName()
+                        + "] is too large (which should be lesser than" + primitiveType.byteSize() + ")" +
+                        "when @BytesInfo sign = false");
+            }
         }
+
     }
 
     private static boolean isSupportNonFixType(Class fieldType){

@@ -55,6 +55,8 @@ public class BytesParser {
     private final Map<Class<? extends BytesSerializable>, ClassInfo> rootNodeClassInfoCache = new HashMap<>();
 
 
+
+
     public <T extends BytesSerializable> byte[] toBytes(T object) throws AnnotationException, IllegalValueException {
         if (object == null) {
             return null;
@@ -71,15 +73,42 @@ public class BytesParser {
         }
         return null;
     }
-    public  <T extends BytesSerializable> T toBean( Class<T> clazz, byte[] array) {
+    public <T extends BytesSerializable> void toBytes(T object, byte data[], int start) throws AnnotationException, IllegalValueException{
+        if (data == null || data.length <= start){
+            throw new InternalException("data[] length is small");
+        }
+        byte src[] = toBytes(object);
+        if (src != null){
+            System.arraycopy(src, 0, data, start, src.length);
+        }
+    }
+
+
+
+    public  <T extends BytesSerializable> T toBean( Class<T> clazz, byte[] data) {
+        if (data == null || data.length == 0) {
+            return null;
+        }
         ByteBuffer buffer;
         try {
-            buffer = ByteBuffer.wrap(array).order(order);
+            AnnotationUtils.checkAnnotationOrThrow(clazz);
+            buffer = ByteBuffer.wrap(data).order(order);
         } catch (IndexOutOfBoundsException | IllegalStateException e) {
             throw new InternalException(e);
         }
         return deserializeBuffer(buffer, clazz);
     }
+
+    public  <T extends BytesSerializable> T toBean( Class<T> clazz, byte[] data, int start) {
+        if (data == null || data.length <= start){
+            throw new InternalException("data[] length is small");
+        }
+        byte dst[] = new byte[data.length - start];
+        System.arraycopy(data, start, dst, 0, dst.length);
+        return toBean(clazz, dst);
+
+    }
+
     private <T extends BytesSerializable> T deserializeBuffer(ByteBuffer buffer, Class<T> clazz) {
         DataNode root = getTairaNode(clazz, charset);
         return (T) root.deserialize(buffer);

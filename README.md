@@ -37,7 +37,7 @@ Student stu2 = bytesParser.toBean(datas);
 
 * 只有实现了BytesSerializable 接口的类，BytesParser才能序列化和反序列化该类
 ##### BytesInfo 注解
-* 类中的Field注解了BytesBytesInfo，才会序列化和反序列该Field
+* 类中的Field注解了BytesInfo，才会序列化和反序列该Field
 * 详细讲解
 	- order 表示该Field在序列化和反序列的顺序，从0开始，必须连续
 	- len 表示基础类型的所占有的Bytes长度，或者表示集合或者数组的个数
@@ -50,7 +50,7 @@ Student stu2 = bytesParser.toBean(datas);
   + 原始类型: boolean、byte、char、short、int、float、long、double
   + 原始类型的封装类
   + Field是实现BytesSerializable 的类的对象
-  + Reserved 对象，用于保留的bytes的长度，即调过解析的
+  + Reserved 对象，用于保留的bytes的长度，即跳过解析
   + Array
   + Collection
 
@@ -66,6 +66,7 @@ Student stu2 = bytesParser.toBean(datas);
 + 实现BytesSerializable的类，必须要有默认的构造函数
 + 当Field是基础类型时，len的长度必须小于等于其默认长度。len为0，就是默认长度。当sign为true是，len < 默认长度
 + 当使用**不定长特性**时，len必须为0，lenFlagBytesSize 必须大于0
++ double长度只支持8, float长度只支持4
 
 ##### 复杂的例子
 
@@ -73,7 +74,7 @@ Student stu2 = bytesParser.toBean(datas);
 public static class Books implements BytesSerializable{
         @BytesInfo(order = 0)
         private int auther;
-        @BytesInfo(order = 1, len = 8)
+        @BytesInfo(order = 1)
         private double price;
         @BytesInfo(order = 2, lenFlagBytesSize = 1)
         private String name;

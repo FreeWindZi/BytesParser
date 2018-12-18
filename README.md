@@ -6,10 +6,17 @@ BytesParser用于实现Bytes序列化，和Bytes反序列化
 #### 添加依赖库
 
 将BytesParser加入你的项目中。比如Gradle构建的项目
+
+repositories 添加
 ```
-implementation "com.sht:bytesparser:0.x"
+    maven { url 'https://www.jitpack.io' }
 ```
-(x是指最新的项目版本16 )
+
+项目的dependencies添加
+```
+    implementation 'com.github.FreeWindZi:BytesParser:0.20'
+```
+
 
 #### 例子
 

@@ -128,8 +128,8 @@ public class BytesParser {
         ClassInfo classInfo = rootNodeClassInfoCache.get(clazz);
         if (classInfo == null){
             classInfo = new ClassInfo();
-            classInfo.nonFixLength = AnnotationUtils.isNonFixLength(clazz);
-            classInfo.byteSize = AnnotationUtils.getMinByteSize(clazz);
+//            classInfo.nonFixLength = AnnotationUtils.isNonFixLength(clazz);
+//            classInfo.byteSize = AnnotationUtils.getMinByteSize(clazz);
         }
         return classInfo;
     }

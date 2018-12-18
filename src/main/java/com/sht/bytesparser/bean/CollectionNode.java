@@ -66,11 +66,14 @@ public class CollectionNode extends FixOrNonFixNode {
         }
 
         if (value == null){
+
+
             if (isFix){
                 return length * memberNode.evaluateSize(null);
             }else {
                 return lenFlagBytesSize;
             }
+
         }
 
 

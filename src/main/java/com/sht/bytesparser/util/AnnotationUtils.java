@@ -184,66 +184,66 @@ public class AnnotationUtils {
 //    private static void checkNonFix()
 
 
-    public static boolean isNonFixLength(Class<? extends BytesSerializable> clazz){
-        List<Field> fields = getSortedBytesInfo(clazz);
-        for (Field field : fields){
-            BytesInfo info = ReflectionUtils.getAnnotation(field, BytesInfo.class);
-            if (info.lenFlag()){
-                return true;
-            }
-            Class fieldType = field.getType();
-            if (TypeConst.isBytesSerializableClass(fieldType) && isNonFixLength(fieldType)){
-                return true;
-            }
-        }
-        return false;
-    }
+//    public static boolean isNonFixLength(Class<? extends BytesSerializable> clazz){
+//        List<Field> fields = getSortedBytesInfo(clazz);
+//        for (Field field : fields){
+//            BytesInfo info = ReflectionUtils.getAnnotation(field, BytesInfo.class);
+//            if (info.lenFlag()){
+//                return true;
+//            }
+//            Class fieldType = field.getType();
+//            if (TypeConst.isBytesSerializableClass(fieldType) && isNonFixLength(fieldType)){
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
 
-    public static int getMinByteSize(Class<? extends BytesSerializable> clazz){
-        int byteSize = 0;
-        List<Field> fields = getSortedBytesInfo(clazz);
-        for (Field field : fields){
-            Class fieldType = field.getType();
-            BytesInfo bytesInfo = ReflectionUtils.getAnnotation(field, BytesInfo.class);
-            PrimitiveType primitiveType = TypeConst.findPrimitive(fieldType);
-            if (primitiveType != null){
-                byteSize += evaluatePrimitiveSize(primitiveType, bytesInfo.len());
-                continue;
-            }
-            if (fieldType == Reserved.class){
-                byteSize += bytesInfo.len();
-                continue;
-            }
-            if (TypeConst.isBytesSerializableClass(fieldType)){
-                byteSize += getMinByteSize(fieldType);
-                continue;
-            }
-
-            if (fieldType == String.class){
-                byteSize += bytesInfo.len();
-                continue;
-            }
-
-            if (TypeConst.isSupportedCollection(fieldType) || fieldType.isArray()) {
-                Class memberType = ReflectionUtils.getCollectionFirstMemberType(field);
-                if (bytesInfo.len() > 0) {
-                    PrimitiveType memberPrimitiveType = TypeConst.findPrimitive(memberType);
-                    if (memberPrimitiveType != null) {
-                        byteSize += (bytesInfo.len() * evaluatePrimitiveSize(memberPrimitiveType, bytesInfo.unitLen()));
-                        continue;
-                    }
-                    if (TypeConst.isBytesSerializableClass(memberType)) {
-                        byteSize += (bytesInfo.len() * getMinByteSize(memberType));
-                        continue;
-                    }
-                    throw new InternalException("memberType [" + memberType.getName() + "]" +
-                            " is not support");
-                }
-            }
-        }
-        return byteSize;
-    }
+//    public static int getMinByteSize(Class<? extends BytesSerializable> clazz){
+//        int byteSize = 0;
+//        List<Field> fields = getSortedBytesInfo(clazz);
+//        for (Field field : fields){
+//            Class fieldType = field.getType();
+//            BytesInfo bytesInfo = ReflectionUtils.getAnnotation(field, BytesInfo.class);
+//            PrimitiveType primitiveType = TypeConst.findPrimitive(fieldType);
+//            if (primitiveType != null){
+//                byteSize += evaluatePrimitiveSize(primitiveType, bytesInfo.len());
+//                continue;
+//            }
+//            if (fieldType == Reserved.class){
+//                byteSize += bytesInfo.len();
+//                continue;
+//            }
+//            if (TypeConst.isBytesSerializableClass(fieldType)){
+//                byteSize += getMinByteSize(fieldType);
+//                continue;
+//            }
+//
+//            if (fieldType == String.class){
+//                byteSize += bytesInfo.len();
+//                continue;
+//            }
+//
+//            if (TypeConst.isSupportedCollection(fieldType) || fieldType.isArray()) {
+//                Class memberType = ReflectionUtils.getCollectionFirstMemberType(field);
+//                if (bytesInfo.len() > 0) {
+//                    PrimitiveType memberPrimitiveType = TypeConst.findPrimitive(memberType);
+//                    if (memberPrimitiveType != null) {
+//                        byteSize += (bytesInfo.len() * evaluatePrimitiveSize(memberPrimitiveType, bytesInfo.unitLen()));
+//                        continue;
+//                    }
+//                    if (TypeConst.isBytesSerializableClass(memberType)) {
+//                        byteSize += (bytesInfo.len() * getMinByteSize(memberType));
+//                        continue;
+//                    }
+//                    throw new InternalException("memberType [" + memberType.getName() + "]" +
+//                            " is not support");
+//                }
+//            }
+//        }
+//        return byteSize;
+//    }
 
     public static int evaluatePrimitiveSize(PrimitiveType type, int annotationLength) {
         int realLength = type.byteSize();

@@ -1,65 +1,20 @@
-#BytesParser
-BytesParser用于实现Bytes序列化，和Bytes反序列化
+package com.sht.bytesparser.annonation.bean;
 
+import com.sht.bytesparser.BytesParser;
+import com.sht.bytesparser.annotation.BytesInfo;
+import com.sht.bytesparser.annotation.BytesSerializable;
+import org.junit.Assert;
+import org.junit.Test;
 
-####添加依赖库
-将BytesParser加入你的项目中。比如Gradle构建的项目
-```
-implementation "com.sht:bytesparser:0.x"
-```
-(x是指最新的项目版本16 )
+import java.nio.ByteOrder;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-####例子
+public class A6_TestAll {
 
-```
-public class Student implements BytesSerializable {
-	 @BytesInfo(order = 0)
-	 int id;
-}
-```
-
-```
-BytesParser bytesParser = new BytesParser.Builder()
-                .order(ByteOrder.BIG_ENDIAN)
-                .build();
-Student stu1 = new Student;
-byte[] datas = bytesParser.toBytes(stu1);
-Student stu2 = bytesParser.toBean(datas);
-```
-
-更多的使用参考见： <a href="src/test/java/com/sht/bytesparser/annonation/" target="_blank">Annotion Test</a>
-
-####重要的类和接口
-#####BytesSerializable 接口
-+ 只有实现了BytesSerializable 接口的类，BytesParser才能序列化和反序列化该类
-#####BytesInfo 注解
-+ 类中的Field注解了BytesBytesInfo，才会序列化和反序列该Field
-+ 详细讲解
-	- order 表示该Field在序列化和反序列的顺序，从0开始，必须连续
-	- len 表示基础类型的所占有的Bytes长度，或者表示集合或者数组的个数
-	- sign 用于表示整数类型（short，int，long）是否有符号
-	- charsetName 用于标定字符串转成bytes数组的编码
-	- lenFlagBytesSize 用于处理不定长的String，数组，集合的长度单位所占用的bytes长度
-####支持类型
-+ 原始类型: boolean、byte、char、short、int、float、long、double
-+ 原始类型的封装类
-+ Field是实现BytesSerializable 的类的对象
-+ Reserved 对象，用于保留的bytes的长度，即调过解析的
-+ Array
-+ Collection
-#####原始类型Bytes的默认长度
-
-|参考| boolean| byte| char| shot| int| long|float| double|
-|-------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| default length| 1| 1| 2 |2|4|8|4|8|
-#####注意事项
-+ 实现BytesSerializable的类，必须要有默认的构造函数
-+ 当Field是基础类型时，len的长度必须小于等于其默认长度。len为0，就是默认长度。当sign为true是，len < 默认长度
-+ 当使用**不定长特性**时，len必须为0，lenFlagBytesSize 必须大于0
-#####复杂的例子
-
-```
-public static class Books implements BytesSerializable{
+    public static class Books implements BytesSerializable{
         @BytesInfo(order = 0)
         private int auther;
         @BytesInfo(order = 1, len = 8)
@@ -144,6 +99,9 @@ public static class Books implements BytesSerializable{
         Writer writer1 = bytesParser.toBean(Writer.class, data);
         Assert.assertEquals(writer, writer1);
         System.out.println(writer1.toString());
-        
+
     }
-```
+
+
+
+}

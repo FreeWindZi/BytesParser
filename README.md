@@ -153,12 +153,6 @@ public static class Books implements BytesSerializable{
             book.price = prices[i];
             writer.books.add(book);
         }
-
-        float val = 12.12f;
-        long v = Double.doubleToLongBits(val);
-        int a = Float.floatToIntBits(val);
-        System.out.println(v +" " + a);
-
         byte[] data = bytesParser.toBytes(writer);
         Writer writer1 = bytesParser.toBean(Writer.class, data);
         Assert.assertEquals(writer, writer1);

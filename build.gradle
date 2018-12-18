@@ -1,5 +1,4 @@
 group 'com.sht'
-version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'idea'
@@ -17,6 +16,7 @@ repositories {
     google()
     jcenter()
     maven { url 'https://jitpack.io' }
+
 }
 
 
@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+    classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
 }
 
 //指定编译的编码

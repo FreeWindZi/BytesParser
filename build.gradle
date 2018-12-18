@@ -3,19 +3,19 @@ group 'com.sht'
 apply plugin: 'java'
 apply plugin: 'idea'
 
-apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven'
+
 
 sourceCompatibility = 1.8
-
+group = 'com.github.FreeWindZi'
 //版本属性
 version = '0.16'
 
 
 repositories {
     mavenCentral()
-    google()
     jcenter()
-    maven { url 'https://jitpack.io' }
+
 
 }
 
@@ -24,7 +24,6 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
 }
 
 //指定编译的编码

@@ -62,7 +62,9 @@ public class StringNode extends FixOrNonFixNode {
         if (isFix){
             byte[] bytesValue = new byte[annotionLen];
             buffer.get(bytesValue);
-            return deleteSuffix(new String(bytesValue, charset));
+            return new String(bytesValue, charset);
+//            return deleteSuffix(new String(bytesValue, charset));
+
         } else {
             length = (int) PrimitiveType.INT.deserialize(buffer, lenFlagBytesSize, false);
             if (length == 0){

@@ -30,5 +30,9 @@ public abstract class FixOrNonFixNode extends Node {
         }else {
             isFix = false;
         }
+        String charsetName = annotation.charsetName();
+        if (!charsetName.equals("")){
+            this.charset = Charset.forName(charsetName);
+        }
     }
 }

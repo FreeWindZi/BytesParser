@@ -9,7 +9,7 @@ apply plugin: 'maven'
 sourceCompatibility = 1.8
 group = 'com.github.FreeWindZi'
 //版本属性
-version = '0.20'
+version = '0.21'
 
 
 repositories {
